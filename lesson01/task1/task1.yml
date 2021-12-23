@@ -1,0 +1,55 @@
+---
+- name: "Task 1: Install and start httpd, create file with content, configure firewalld"
+  hosts: all
+  
+  tasks:
+  - name: install httpd
+    package:
+      name: httpd
+      state: present
+
+  - name: start httpd service
+    service:
+      name: httpd
+      enabled: yes
+      state: started
+
+  - name: Create index.html
+    copy:
+      dest: "/var/www/html/index.html"
+      content: | 
+              "Welcome to my web server"
+      mode: 0644
+      owner: apache
+      group: apache
+
+  - name: Install firewalld
+    package:
+      name: firewalld
+      state: present
+      
+  - name: start firewalld
+    service:
+      name: firewalld
+      state: started
+      enabled: yes
+      
+  - name: allow web ports 
+    firewalld:   
+      service: "{{ item }}"
+      permanent: true
+      state: enabled
+    notify: 
+      - restart_web_service
+    loop:
+            - http
+            - https
+
+  handlers:
+    - name: restart_web_service
+      service:
+              name: firewalld
+              state: restarted
+...
+
+

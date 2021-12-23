@@ -1,0 +1,52 @@
+---
+- name: "Task 2: Uninstall httpd, remove file with content, close ports"
+  hosts: all
+  
+  tasks:
+  - name: uninstall httpd
+    package:
+      name: httpd
+      state: absent
+
+      #- name: start httpd service
+      #service:
+      #name: httpd
+      #enabled: yes
+      #state: started
+
+  - name: remove index.html file
+    file:
+      path: "/var/www/html/index.html"
+      state: absent
+      
+
+  - name: Install firewalld
+    package:
+      name: firewalld
+      state: present
+      
+  - name: start firewalld
+    service:
+      name: firewalld
+      state: started
+      enabled: yes
+      
+  - name: allow web ports 
+    firewalld:   
+      service: "{{ item }}"
+      permanent: true
+      state: disabled
+    notify: 
+      - restart_web_service
+    loop:
+            - http
+            - https
+
+  handlers:
+    - name: restart_web_service
+      service:
+              name: firewalld
+              state: restarted
+...
+
+

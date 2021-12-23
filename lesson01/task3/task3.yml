@@ -1,0 +1,41 @@
+---
+- name: "Task 3: Modify grub"
+  hosts: all
+  vars:
+          remote_file: /etc/default/grub 
+
+  tasks:
+  - name: Check net.ifnames=0 parameter
+    shell: grep -c "net.ifnames=0" {{ remote_file }} || true
+    register: check_ifnames
+    changed_when: check_ifnames.stdout == "0"
+    
+
+  - name: Check net.biosdevname=0 parameter
+    shell: grep -c "biosdevname=0"  {{ remote_file }} || true
+    register: check_biosdevname
+    changed_when: check_biosdevname.stdout == "0"
+  
+  - name: add line net.ifnames=0
+    lineinfile:
+      path:  "{{ remote_file }}"
+      regexp: '(GRUB_CMDLINE_LINUX=.*)"(?!net.ifnames=0)' 
+      line: '\1 net.ifnames=0"'
+      backrefs: yes
+      state: present
+    when: check_ifnames.stdout == "0"
+
+  - name: add biosdevname=0 
+    lineinfile:
+          backrefs: true
+          state: present
+          line: '\1 biosdevname=0"'
+          regexp: '(GRUB_CMDLINE_LINUX=.*)"(?!biosdevname=0)'
+          path:  "{{ remote_file }}"
+    when:  check_biosdevname.stdout == "0"
+
+  - name: run grub2-mkconfig
+    command: grub2-mkconfig
+    when: check_ifnames.stdout == "0" or check_biosdevname.stdout == "0"
+
+...

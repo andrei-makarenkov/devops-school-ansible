@@ -1,0 +1,31 @@
+---
+- name: "Create Multiple Users"
+  hosts: all
+  #  gather_facts: no
+  vars_files:
+          - secret.yml  
+
+  tasks:
+          - name: Creating Users
+            user:
+                    name: "{{ item.name }}"
+                    password: "{{ pwhash | password_hash('sha512', 'SomeRandomString')}}"
+                    state: present 
+                    #remove: yes
+                    create_home: yes
+                    home: "{{ item.home }}"
+                    comment: "{{ item.comment }}"
+
+            loop:
+              - name: Alice
+                comment: Alice@example.com
+                home: /home/Alice
+
+              - name: Bob
+                comment: Bob@example.com
+                home: /home/Bob
+
+              - name: Carol
+                comment: Carol@example.com
+                home: /home/Carol
+...
