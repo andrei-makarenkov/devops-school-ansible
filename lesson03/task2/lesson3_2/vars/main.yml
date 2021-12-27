@@ -1,0 +1,13 @@
+---
+# vars file for lesson3_2
+vsftpd_ports: 20-21
+vsftpd_enabled: true
+restart_vsftpd: restarted
+vsftpd_package: present
+vsftpd_state: started
+
+firewalld_enabled: true
+firewalld_restart_var: reloaded
+firewalld_package: present
+firewalld_state: started
+...

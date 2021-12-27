@@ -1,0 +1,72 @@
+---
+# tasks file for lesson3_2
+- name: install vsftpd
+  package: 
+    name: vsftpd
+    update_cache: true
+    state: "{{ vsftpd_package }}"
+
+- include_tasks: selinux.yml
+
+- name: copy vsftpd.conf
+  template:
+    src: templates/vsftpd_conf.j2
+    dest: /etc/vsftpd/vsftpd.conf
+    mode: 0600
+  notify: restart_vsftpd
+
+- name: "create {{ anon_root }} directory"
+  file:
+    path: "{{ anon_root }}"
+    owner: ftp
+    group: ftp
+    mode: 0755
+    state: directory
+
+
+- name: "create {{ anon_upload_root }} directory"
+  file: 
+    path: "{{ anon_upload_root }}"
+    owner: ftp
+    group: ftp
+    mode: 0755
+    setype: public_content_rw_t
+    state: directory
+
+
+- name: vsftpd enabled
+  service:
+    name: vsftpd
+    state: "{{ vsftpd_state }}"
+    enabled: "{{ vsftpd_enabled }}"
+
+
+- name: firewalld
+  yum:
+    name: firewalld
+    update_cache: true
+    state: "{{ firewalld_package }}"
+
+
+- name: firewalld enabled
+  service: 
+    name: firewalld
+    state: "{{ firewalld_state }}"
+    enabled: "{{ firewalld_enabled }}"
+
+
+- name: permit traffic
+  firewalld:
+    port: "{{ vsftpd_ports }}/tcp"
+    state: enabled
+    permanent: true
+    immediate: true
+  notify: restart_firewalld
+
+- name: allow traffic passive connections
+  firewalld:
+    port: "{{ pasv_min_port }}-{{ pasv_max_port }}/tcp"
+    state: enabled
+    permanent: true
+    immediate: true
+  notify: restart_firewalld

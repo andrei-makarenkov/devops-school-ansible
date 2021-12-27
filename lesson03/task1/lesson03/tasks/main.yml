@@ -1,0 +1,41 @@
+---
+  - name: install httpd
+    package:
+      name: httpd
+      state: "{{ httpd_package_state }}"
+
+  - name: check httpd service is up and running
+    service:
+      name: httpd
+      enabled: "{{ httpd_enabled }}"
+      state: "{{ httpd_state }}"
+
+  - name: Copy index.html
+    template:
+      src: files/index.html
+      dest: "/var/www/html/index.html"
+      mode: 0644
+      #owner: apache
+      #group: apache
+    notify: restart_web_service
+
+  - name: Check firewalld
+    package:
+      name: firewalld
+      state: "{{ firewalld_package_state }}"
+      
+  - name: check firewalld service is up and running
+    service:
+      name: firewalld
+      state: "{{ firewalld_state }}"
+      enabled: "{{ firewalld_enabled }}"
+      
+  - name: allow web ports 
+    firewalld:   
+      port: "{{ httpd_port }}/tcp"
+      permanent: true
+      state: enabled
+      immediate: true
+    notify: restart_firewalld
+
+...

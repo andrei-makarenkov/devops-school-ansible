@@ -1,0 +1,12 @@
+---
+- name: restart_web_service
+  service:
+      name: httpd
+      enabled: yes
+      state: "{{httpd_restart_var}}"
+
+- name: restart_firewalld
+  service:
+    name: firewalld
+    state: "{{firewalld_restart_var}}"
+...

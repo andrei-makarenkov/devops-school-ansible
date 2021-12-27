@@ -1,0 +1,16 @@
+---
+- name: selinux is installed 
+  package:
+    name: 
+      - selinux-policy-targeted
+      - selinux-policy-devel
+    update_cache: true
+    state: latest
+  become: true
+
+- name:  allow anonymous write
+  seboolean:
+    name: ftpd_anon_write
+    state: yes
+    persistent: yes
+  become: true

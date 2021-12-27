@@ -1,0 +1,12 @@
+---
+# handlers file for lesson3_2
+- name: restart_vsftpd
+  service:
+      name: vsftpd
+      state: "{{ restart_vsftpd }}"
+
+- name: restart_firewalld
+  service:
+    name: firewalld
+    state: "{{firewalld_restart_var}}"
+...

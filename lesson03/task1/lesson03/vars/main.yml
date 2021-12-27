@@ -1,0 +1,19 @@
+# vars file for lesson03
+---
+# httpd block
+httpd_port: 80
+
+httpd_enabled: true
+httpd_restart_var: reloaded
+
+httpd_package_state: present
+httpd_state: started
+
+
+# firewall block 
+firewalld_enabled: true
+firewalld_restart_var: reloaded
+
+firewalld_package_state: present
+firewalld_state: started
+...
